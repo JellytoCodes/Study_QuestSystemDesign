@@ -36,18 +36,37 @@ void ATriggerQuestVolume::OnOverlapBegin(UPrimitiveComponent *OverlappedComp, AA
 	{
 		if(UUPrototypeQuestSubsystem* QuestSystem = GetGameInstance()->GetSubsystem<UUPrototypeQuestSubsystem>())
 		{
-			FName Current = QuestSystem->GetCurrentQuestID();
-			if(QuestIDs.Contains(Current))
+			if (APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0))
 			{
-				if (APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0))
+				if (AGameHUD* HUD = Cast<AGameHUD>(PC->GetHUD()))
 				{
-					if (AGameHUD* HUD = Cast<AGameHUD>(PC->GetHUD()))
+					if(TriggerType == EQuestTriggerType::QuestStart)
 					{
-						HUD->CompletedWidget(Current);
+						for(FName QuestID : QuestIDs)
+						{
+							if(!QuestSystem->IsQuestStarted(QuestID))
+							{
+								QuestSystem->SetQuestState(QuestID, true, false);
+								HUD->StartedWidget(QuestID);
+
+								break;
+							}
+						}
+					}
+					else if(TriggerType == EQuestTriggerType::QuestComplete)
+					{
+						for(FName QuestID : QuestIDs)
+						{
+							if(!QuestSystem->IsQuestCompleted(QuestID))
+							{
+								QuestSystem->SetQuestState(QuestID, false, true);
+								HUD->CompletedWidget(QuestID);
+								break;
+							}
+						}
 					}
 				}
-			}
-			QuestSystem->SetQuestState(Current, true);
+			}		
 		}
 	}
 	BoxComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);

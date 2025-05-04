@@ -45,20 +45,22 @@ class APrototypeProjectCharacter : public ACharacter
 	UInputAction* LookAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* PauseAction;
+	UInputAction* PauseAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* ResumeAction;
+	UInputAction* InteractAction;
 
 public:
 	APrototypeProjectCharacter();
 	
 
 protected:
+	virtual void Tick(float DeltaSecond);
 
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void Pause(const FInputActionValue& Value);
+	void Interact(const FInputActionValue& Value);
 
 protected:
 

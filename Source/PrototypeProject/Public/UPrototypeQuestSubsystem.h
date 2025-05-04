@@ -6,7 +6,16 @@
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "UPrototypeQuestSubsystem.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnQuestUpdated, FName, QuestID);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnQuestUpdated, FName, QuestID, bool, bCompleted);
+
+USTRUCT()
+struct FQuestData
+{
+	GENERATED_BODY()
+
+	bool bIsStarted = false;
+	bool bIsCompleted = false;
+};
 
 UCLASS()
 class PROTOTYPEPROJECT_API UUPrototypeQuestSubsystem : public UGameInstanceSubsystem
@@ -17,22 +26,16 @@ public :
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
 
-	void SetQuestState(FName QuestID, bool bCompleted);
+	void SetQuestState(FName QuestID, bool bStart, bool bCompleted);
+	bool IsQuestStarted(FName QuestID) const;
 	bool IsQuestCompleted(FName QuestID) const;
 
 	UPROPERTY(BlueprintAssignable)
 	FOnQuestUpdated OnQuestUpdated;
 
-	FName GetCurrentQuestID() const;
-	void AdvanceToNextQuest();
+	FName GetCurrentQuestID(bool bIsCompleted) const;
 
 private :
 	TMap<FName, bool> QuestStateMap;
-	TArray<FName> QuestList
-	{
-		"EnteredArea01",
-		"EnteredArea02",
-	};
-
-	int32 CurrentQuestIndex = 0;
+	TMap<FName, FQuestData> QuestMap;
 };

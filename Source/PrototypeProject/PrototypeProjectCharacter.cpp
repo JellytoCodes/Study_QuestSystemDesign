@@ -12,6 +12,7 @@
 #include "InputActionValue.h"
 #include "UPrototypeQuestSubsystem.h"
 #include "TimeManager.h"
+#include "QuestNPC.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -60,6 +61,12 @@ void APrototypeProjectCharacter::BeginPlay()
 	Timer = GetGameInstance()->GetSubsystem<UTimeManager>();
 }
 
+void APrototypeProjectCharacter::Tick(float DeltaSecond)
+{
+	Super::Tick(DeltaSecond);
+
+}
+
 void APrototypeProjectCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	// Add Input Mapping Context
@@ -79,6 +86,7 @@ void APrototypeProjectCharacter::SetupPlayerInputComponent(UInputComponent* Play
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APrototypeProjectCharacter::Move);
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APrototypeProjectCharacter::Look);
 		EnhancedInputComponent->BindAction(PauseAction, ETriggerEvent::Started, this, &APrototypeProjectCharacter::Pause);
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &APrototypeProjectCharacter::Interact);
 	}
 	else
 	{
@@ -134,10 +142,43 @@ void APrototypeProjectCharacter::Pause(const FInputActionValue &Value)
 	}
 }
 
+void APrototypeProjectCharacter::Interact(const FInputActionValue &Value)
+{
+	FHitResult Hit;
+	FVector Start = FollowCamera->GetComponentLocation();
+	FVector End = Start +FollowCamera->GetForwardVector() * 700.f;
+
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+
+	if(GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Interact!"));
+		DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 1.0f, 0, 2.0f);
+
+		UPrimitiveComponent* HitComp = Hit.GetComponent();
+		if(HitComp)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Hit Actor: %s"), *Hit.GetActor()->GetName());
+			UE_LOG(LogTemp, Warning, TEXT("Hit Comp: %s"), *HitComp->GetName());
+
+			if(AQuestNPC* NPC = Cast<AQuestNPC>(HitComp->GetOwner()))
+			{
+				UE_LOG(LogTemp, Warning, TEXT("NPC Interact!"));
+				NPC->Interact(this);
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("No actor hit"));
+			}
+		}
+	}
+}
+
 void APrototypeProjectCharacter::NotifyItemPicked()
 {
 	if(UUPrototypeQuestSubsystem* QuestSys = GetGameInstance()->GetSubsystem<UUPrototypeQuestSubsystem>())
 	{
-		QuestSys->SetQuestState(TEXT("PickedKeyItem"), true);
+		QuestSys->SetQuestState(TEXT("PickedKeyItem"), false, true);
 	}
 }

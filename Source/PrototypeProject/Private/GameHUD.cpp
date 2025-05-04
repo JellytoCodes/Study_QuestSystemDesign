@@ -45,8 +45,6 @@ void AGameHUD::BeginPlay()
 
     TimerWidget->AddToViewport();
     QuestWidget->AddToViewport();
-
-    QuestWidget->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void AGameHUD::Tick(float DeltaSeconds)
@@ -70,32 +68,19 @@ void AGameHUD::CompletedWidget(FName QuestID)
     {
         if (QuestWidget)
         {
-            QuestWidget->SetVisibility(ESlateVisibility::Visible);
-
-		    FTimerHandle ViewTimer;
-		    GetWorld()->GetTimerManager().SetTimer(ViewTimer, [&]()
-		    {
-			    QuestWidget->SetVisibility(ESlateVisibility::Hidden);
-		    }, 4.f, false);
+            QuestWidget->PlayFadeAnimation();
         }
     }
 }
 
 void AGameHUD::StartedWidget(FName QuestID)
 {
-    Timer->PauseDefensePhase();
-
     if (QuestWidgetUI)
     {
         if (QuestWidget)
         {
-            QuestWidget->AddToViewport();
-
-		    FTimerHandle ViewTimer;
-		    GetWorld()->GetTimerManager().SetTimer(ViewTimer, [&]()
-		    {
-			    QuestWidget->RemoveFromParent();
-		    }, 4.f, false);
+            QuestWidget->OnQuestUpdated(QuestID, false);
+            QuestWidget->PlayFadeAnimation();
         }
     }
 }

@@ -13,26 +13,44 @@ void UQuestUIWidget::NativeConstruct()
 	{
 		Sub->OnQuestUpdated.AddDynamic(this, &UQuestUIWidget::OnQuestUpdated);
 	}
-}
 
-void UQuestUIWidget::OnQuestUpdated(FName QuestID)
-{
-	if(QuestStatusText)
+	EndDelegate.BindDynamic(this, &UQuestUIWidget::OnFadeOutFinished);
+
+	if(FadeInOut)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Quest Completed: %s"), *QuestID.ToString());
-		QuestStatusText->SetText(FText::FromString(FString::Printf(TEXT("%s Quest Completed!"), *QuestID.ToString())));
+		BindToAnimationFinished(FadeInOut, EndDelegate);
 	}
 }
 
-void UQuestUIWidget::OnQuestAlram(FName QuestID)
+void UQuestUIWidget::OnQuestUpdated(FName QuestID, bool bIsCompleted)
 {
 	if(QuestStatusText)
 	{
-		QuestStatusText->SetText(FText::FromString(FString::Printf(TEXT("%s Quest Start!"), *QuestID.ToString())));
+		if(bIsCompleted)
+		{
+			QuestStatusText->SetText(FText::FromString(FString::Printf(TEXT("%s Quest Completed!"), *QuestID.ToString())));
+		}
+		else
+		{
+			QuestStatusText->SetText(FText::FromString(FString::Printf(TEXT("%s Quest Started!"), *QuestID.ToString())));
+		}
 	}
+}
+
+void UQuestUIWidget::OnFadeOutFinished()
+{
+	SetVisibility(ESlateVisibility::Hidden);
 }
 
 void UQuestUIWidget::TextSet()
 {
 	QuestStatusText->SetText(FText::FromString(FString::Printf(TEXT("Quest Filed!"))));
+}
+
+void UQuestUIWidget::PlayFadeAnimation()
+{
+	if(FadeInOut)
+	{
+		PlayAnimation(FadeInOut);
+	}
 }

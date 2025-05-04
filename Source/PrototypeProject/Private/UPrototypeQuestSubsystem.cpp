@@ -15,38 +15,45 @@ void UUPrototypeQuestSubsystem::Deinitialize()
 	QuestStateMap.Empty();
 }
 
-void UUPrototypeQuestSubsystem::SetQuestState(FName QuestID, bool bCompleted)
+void UUPrototypeQuestSubsystem::SetQuestState(FName QuestID, bool bStart, bool bCompleted)
 {
-	if(QuestList.IsValidIndex(CurrentQuestIndex) && QuestList[CurrentQuestIndex] == QuestID)
-	{
-		QuestStateMap.Add(QuestID, bCompleted);
-		UE_LOG(LogTemp, Log, TEXT("Quest Clear : %s"), *QuestID.ToString());
-		OnQuestUpdated.Broadcast(QuestID);
-		AdvanceToNextQuest();
-	}
+	FQuestData& Quest = QuestMap.FindOrAdd(QuestID);
+	if(bStart) Quest.bIsStarted = true;
+	if(bCompleted) Quest.bIsCompleted = true;
+
+	OnQuestUpdated.Broadcast(QuestID, Quest.bIsCompleted);
 }
 
-bool UUPrototypeQuestSubsystem::IsQuestCompleted(FName QuestID) const
+bool UUPrototypeQuestSubsystem::IsQuestStarted(FName QuestID) const
 {
-	if(const bool* bState = QuestStateMap.Find(QuestID))
+	if(const FQuestData* Quest = QuestMap.Find(QuestID))
 	{
-		return *bState;
+		return Quest->bIsStarted;
 	}
 	return false;
 }
 
-FName UUPrototypeQuestSubsystem::GetCurrentQuestID() const
+bool UUPrototypeQuestSubsystem::IsQuestCompleted(FName QuestID) const
 {
-	if(QuestList.IsValidIndex(CurrentQuestIndex))
+	if(const FQuestData* Quest = QuestMap.Find(QuestID))
 	{
-		UE_LOG(LogTemp, Log, TEXT("CurrentQuestIndex : %d"), CurrentQuestIndex);
-		return QuestList[CurrentQuestIndex];
+		return Quest->bIsCompleted;
 	}
-	return NAME_None;
+	return false;
 }
 
-void UUPrototypeQuestSubsystem::AdvanceToNextQuest()
+FName UUPrototypeQuestSubsystem::GetCurrentQuestID(bool bIsCompleted) const
 {
-	//OnQuestUpdated.Broadcast(GetCurrentQuestID());
-	CurrentQuestIndex++;
+	for (const TPair<FName, FQuestData>& Elem : QuestMap)
+	{
+		if(bIsCompleted && Elem.Value.bIsCompleted)
+		{
+			return Elem.Key;
+		}
+		else if(!bIsCompleted && Elem.Value.bIsStarted && !Elem.Value.bIsCompleted)
+		{
+			return Elem.Key;
+		}
+	}
+	return NAME_None;
 }

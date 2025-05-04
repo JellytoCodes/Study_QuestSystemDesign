@@ -6,6 +6,14 @@
 #include "GameFramework/Actor.h"
 #include "TriggerQuestVolume.generated.h"
 
+UENUM(BlueprintType)
+enum class EQuestTriggerType : uint8
+{
+	QuestStart UMETA(DisplayName = "Start"),
+	QuestComplete UMETA(DisplayName = "Complete"),
+	Interaction UMETA(DisplayName = "Interact"),
+};
+
 class UBoxComponent;
 class UUserWidget;
 
@@ -31,8 +39,13 @@ public :
 	{
 		"EnteredArea01",
 		"EnteredArea02",
+		"TalkToNPC1",
 	};
+
 private :
 	UPROPERTY(VisibleAnywhere)
 	UBoxComponent* BoxComponent;
+	
+	UPROPERTY(EditAnywhere, Category = "Quest", meta = (AllowPrivateAccess = "true"))
+	EQuestTriggerType TriggerType = EQuestTriggerType::QuestStart;
 };
