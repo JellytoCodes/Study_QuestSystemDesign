@@ -12,29 +12,29 @@
    보다 이 기능을 구현하기 위해 왜 이런 구조를 설계하였는가? 라는 목표로 하고자합니다.
 
 ## 학습 목표
-1. UGameInstanceSubsystem 및 UWorldSubsystem의 구조 이해
+1. UGameInstanceSubsystem 및 UWorldSubsystem의 구조 이해  
 
-2. Subsystem을 활용한 **데이터 중심 퀘스트 흐름** 구현
+2. Subsystem을 활용한 **데이터 중심 퀘스트 흐름** 구현  
 
-3. DataTable을 활용한 **데이터 관리 방법** 진행
+3. DataTable을 활용한 **데이터 관리 방법** 진행  
 
 ## 구현 시스템
 
-1. UPrototypeQuestSubsystem [GameInstanceSubsystem Class]
+1. UPrototypeQuestSubsystem [GameInstanceSubsystem Class]  
 → 퀘스트 등록 / 진행 / 완료 상태 관리
 
-2. AQuestTriggerVolume [Actor Class]
+2. AQuestTriggerVolume [Actor Class]  
 → 퀘스트 트리거 영역 판별 및 퀘스트 현황 Subsystem 연동
 
-3. AQuestNPC [Actor Class]
+3. AQuestNPC [Actor Class]  
 → 상호작용에 의한 퀘스트 발생 및 퀘스트 현황 Subsystem 연동
 → 퀘스트 완료 조건 제어
  
-4. UQuestUIWidget [UserWidget Class]
+4. UQuestUIWidget [UserWidget Class]  
 → 퀘스트 이름/상태 출력 담당
 → 출력 애니메이션 (Fade In/Out) 구현
 
-5. GameHUD [HUD Class]
+5. GameHUD [HUD Class]  
 → UI 매니징 및 위젯 호출 처리 담당
 
 ## 학습한 기술
