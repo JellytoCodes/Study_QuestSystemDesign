@@ -49,7 +49,7 @@
  - [X] Delegate 기반 UI 출력
  - [ ] DataTable 연동
  - [ ] SaveGame 구조 (퀘스트 현황 Save / Load)
- - [ ]병렬 퀘스트 대응 설계
+ - [ ] 병렬 퀘스트 대응 설계
 
 ## Author
  **JellytoCodes / 2025.05**
