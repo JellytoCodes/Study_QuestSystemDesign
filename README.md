@@ -21,18 +21,18 @@
 ## 구현 시스템
 
 1. UPrototypeQuestSubsystem [GameInstanceSubsystem Class]
-  - 퀘스트 등록 / 진행 / 완료 상태 관리
+  → 퀘스트 등록 / 진행 / 완료 상태 관리
 
 2. AQuestTriggerVolume [Actor Class]
-  - 퀘스트 트리거 영역 판별 및 퀘스트 현황 Subsystem 연동
+  → 퀘스트 트리거 영역 판별 및 퀘스트 현황 Subsystem 연동
 
 3. AQuestNPC [Actor Class]
-  - 상호작용에 의한 퀘스트 발생 및 퀘스트 현황 Subsystem 연동
-  - 퀘스트 완료 조건 제어
+  → 상호작용에 의한 퀘스트 발생 및 퀘스트 현황 Subsystem 연동
+  → 퀘스트 완료 조건 제어
  
 4. UQuestUIWidget [UserWidget Class]
-  - 퀘스트 이름/상태 출력 담당
-  - 출력 애니메이션 (Fade In/Out) 구현
+  → 퀘스트 이름/상태 출력 담당
+  → 출력 애니메이션 (Fade In/Out) 구현
 
 5. GameHUD [HUD Class]
   - UI 매니징 및 위젯 호출 처리 담당
