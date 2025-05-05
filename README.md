@@ -23,7 +23,7 @@
  1. UPrototypeQuestSubsystem [GameInstanceSubsystem Class]
   - 퀘스트 등록 / 진행 / 완료 상태 관리
 
- 3. AQuestTriggerVolume [Actor Class]
+ 2. AQuestTriggerVolume [Actor Class]
   - 퀘스트 트리거 영역 판별 및 퀘스트 현황 Subsystem 연동
 
  3. AQuestNPC [Actor Class]
