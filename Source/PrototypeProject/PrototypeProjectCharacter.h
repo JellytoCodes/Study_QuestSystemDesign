@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
+#include "QuestNameDefs.h"
 #include "PrototypeProjectCharacter.generated.h"
 
 class USpringArmComponent;
@@ -49,6 +50,9 @@ class APrototypeProjectCharacter : public ACharacter
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* InteractAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* QuestTestAction;
 
 public:
 	APrototypeProjectCharacter();

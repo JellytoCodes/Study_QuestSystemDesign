@@ -24,22 +24,25 @@ void UQuestUIWidget::NativeConstruct()
 
 void UQuestUIWidget::OnQuestUpdated(FName QuestID, bool bIsCompleted)
 {
-	if(QuestStatusText)
+	FQueuedQuestNotification NewNotify;
+	NewNotify.QuestID = QuestID;
+	NewNotify.bIsCompleted = bIsCompleted;
+	QuestNotificationQueue.Enqueue(NewNotify);
+
+	if(!bIsPlaying)
 	{
-		if(bIsCompleted)
-		{
-			QuestStatusText->SetText(FText::FromString(FString::Printf(TEXT("%s Quest Completed!"), *QuestID.ToString())));
-		}
-		else
-		{
-			QuestStatusText->SetText(FText::FromString(FString::Printf(TEXT("%s Quest Started!"), *QuestID.ToString())));
-		}
+		PlayNextNotification();
 	}
+
 }
 
 void UQuestUIWidget::OnFadeOutFinished()
 {
 	SetVisibility(ESlateVisibility::Hidden);
+	
+	bIsPlaying = false;
+
+	PlayNextNotification();
 }
 
 void UQuestUIWidget::TextSet()
@@ -51,6 +54,34 @@ void UQuestUIWidget::PlayFadeAnimation()
 {
 	if(FadeInOut)
 	{
-		PlayAnimation(FadeInOut);
+		SetVisibility(ESlateVisibility::Visible);
+		StopAnimation(FadeInOut);
+		PlayAnimation(FadeInOut, 0.f, 1);
+	}
+}
+
+void UQuestUIWidget::PlayNextNotification()
+{
+	if(bIsPlaying) return;
+
+	FQueuedQuestNotification Notify;
+	if(QuestNotificationQueue.Dequeue(Notify))
+	{
+		if(QuestStatusText)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Notify.bIsCompleted : %d"), Notify.bIsCompleted);
+			//퀘스트 완료 여부에 따라 메시지 출력
+			FString Msg = Notify.bIsCompleted
+			? FString::Printf(TEXT("%s Quest Completed!"), *Notify.QuestID.ToString())
+			: FString::Printf(TEXT("%s Quest Started!"), *Notify.QuestID.ToString());
+			QuestStatusText->SetText(FText::FromString(Msg));
+		}
+
+		//애니메이션 출력
+
+		SetVisibility(ESlateVisibility::Visible);
+		StopAnimation(FadeInOut);
+		PlayAnimation(FadeInOut, 0.f, 1);
+		bIsPlaying = true;
 	}
 }

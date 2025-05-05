@@ -4,9 +4,9 @@
 #include "QuestNPC.h"
 #include "PrototypeProject/PrototypeProjectCharacter.h"
 #include "Kismet/GameplayStatics.h"
-#include "UPrototypeQuestSubsystem.h"
 #include "GameHUD.h"
 #include "Components/BoxComponent.h"
+
 // Sets default values
 AQuestNPC::AQuestNPC()
 {
@@ -24,7 +24,11 @@ AQuestNPC::AQuestNPC()
 void AQuestNPC::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	if (UUPrototypeQuestSubsystem* QuestSystem = GetGameInstance()->GetSubsystem<UUPrototypeQuestSubsystem>())
+	{
+		QuestSystem->RegisterQuest(FQuestNameHelper::ToFName(QuestID), TriggerType);
+	}
 }
 
 // Called every frame
@@ -36,26 +40,34 @@ void AQuestNPC::Tick(float DeltaTime)
 
 bool AQuestNPC::Interact(APrototypeProjectCharacter *PlayerCharacter)
 {
-	UE_LOG(LogTemp, Warning, TEXT("TriggerType: %d"), static_cast<uint8>(TriggerType));
-	if(TriggerType == EQuestTriggerType::Interaction)
+	if(UUPrototypeQuestSubsystem* QuestSystem = GetGameInstance()->GetSubsystem<UUPrototypeQuestSubsystem>())
 	{
-		UE_LOG(LogTemp, Log, TEXT("NPC Interact"));
-		if(UUPrototypeQuestSubsystem* QuestSystem = GetGameInstance()->GetSubsystem<UUPrototypeQuestSubsystem>())
-		{
-			UE_LOG(LogTemp, Log, TEXT("QuestSystem Successed"));
-			for(FName QuestID : QuestIDs)
+		FName QuestName = FQuestNameHelper::ToFName(QuestID);
+		EQuestTriggerType Type = QuestSystem->GetQuestTriggerType(QuestName);
+		
+		if(Type == TriggerType) //TriggerType = EQuestTriggerType::Interaction
+		{			
+			if(APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0))
 			{
-				if(!QuestSystem->IsQuestStarted(QuestID))
-				{					
-					if(APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0))
+				if(AGameHUD* HUD = Cast<AGameHUD>(PC->GetHUD()))
+				{
+					if(!QuestSystem->IsQuestStarted(QuestName))
 					{
-						if(AGameHUD* HUD = Cast<AGameHUD>(PC->GetHUD()))
-						{
-							QuestSystem->SetQuestState(QuestID, true, false);
-							HUD->StartedWidget(QuestID);
-							break;
-						}
+						FQuestData Data;
+						Data.TriggerType = EQuestTriggerType::Interaction;
+						Data.ConditionType = EQuestConditionType::PickupItem;
+						Data.RequiredValue = "KEY001";
+
+						QuestSystem->SetQuestStarted(QuestName, Data);
+
+						HUD->StartedWidget(QuestName);
 					}
+					/*PiupItemQuest 변경으로 해당 코드는 사용하지 않음
+					else if(!QuestSystem->IsQuestCompleted(QuestName))
+					{
+						QuestSystem->SetQuestCompleted(QuestName);
+						HUD->CompletedWidget(QuestName);
+					}*/
 				}
 			}
 			return true;

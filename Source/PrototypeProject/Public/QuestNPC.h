@@ -4,7 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "TriggerQuestVolume.h"
+#include "UPrototypeQuestSubsystem.h"
+#include "QuestNameDefs.h"
 #include "QuestNPC.generated.h"
 
 UCLASS()
@@ -20,13 +21,13 @@ public:
 	AQuestNPC();
 
 	UPROPERTY(EditAnywhere, Category = "Quest")
-	TArray<FName> QuestIDs
-	{
-		"TalkToNPC1",
-	};
+	EQuestName QuestID;
 
-	UPROPERTY(EditAnywhere, Category = "Quest")
+	UPROPERTY(EditDefaultsOnly, Category = "Quest")
 	EQuestTriggerType TriggerType = EQuestTriggerType::Interaction;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Quest")
+	EQuestConditionType ConditionType = EQuestConditionType::PickupItem;
 
 	bool Interact(class APrototypeProjectCharacter* PlayerCharacter);
 

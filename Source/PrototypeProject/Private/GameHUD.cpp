@@ -63,26 +63,11 @@ void AGameHUD::Tick(float DeltaSeconds)
 void AGameHUD::CompletedWidget(FName QuestID)
 {
     Timer->PauseDefensePhase();
-
-    if (QuestWidgetUI)
-    {
-        if (QuestWidget)
-        {
-            QuestWidget->PlayFadeAnimation();
-        }
-    }
 }
 
 void AGameHUD::StartedWidget(FName QuestID)
 {
-    if (QuestWidgetUI)
-    {
-        if (QuestWidget)
-        {
-            QuestWidget->OnQuestUpdated(QuestID, false);
-            QuestWidget->PlayFadeAnimation();
-        }
-    }
+
 }
 
 void AGameHUD::GameClear()

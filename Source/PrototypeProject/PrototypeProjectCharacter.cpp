@@ -87,6 +87,7 @@ void APrototypeProjectCharacter::SetupPlayerInputComponent(UInputComponent* Play
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APrototypeProjectCharacter::Look);
 		EnhancedInputComponent->BindAction(PauseAction, ETriggerEvent::Started, this, &APrototypeProjectCharacter::Pause);
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &APrototypeProjectCharacter::Interact);
+		EnhancedInputComponent->BindAction(QuestTestAction, ETriggerEvent::Started, this, &APrototypeProjectCharacter::NotifyItemPicked);
 	}
 	else
 	{
@@ -179,6 +180,7 @@ void APrototypeProjectCharacter::NotifyItemPicked()
 {
 	if(UUPrototypeQuestSubsystem* QuestSys = GetGameInstance()->GetSubsystem<UUPrototypeQuestSubsystem>())
 	{
-		QuestSys->SetQuestState(TEXT("PickedKeyItem"), false, true);
+		UE_LOG(LogTemp, Warning, TEXT("NotifyItemPicked!"));
+		QuestSys->TryCompleteQuest(FQuestNameHelper::ToFName(EQuestName::TalkToNPC01), EQuestConditionType::PickupItem, "KEY001");
 	}
 }
