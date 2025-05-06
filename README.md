@@ -38,18 +38,28 @@
 → UI 매니징 및 위젯 호출 처리 담당  
 
 ## 학습한 기술
-1. Unreal Subsystem 구조
-    
-2. Delegate를 활용한 Subsystem↔UI 출력 연동
+1. 언리얼 구조를 이해하면서 OOP 설계 원칙 중 **단일 책임 원칙(SRP)**, **의존성 역전 원칙(DIP)**을 학습
 
-3. 상태 기반 퀘스트 구조 설계
+2. Subsystem을 통해 퀘스트 진행 조건을 Actor가 직접 판단하지 않는 **단일 책임 원칙(SRP)**을 학습
+   
+3. Delegate를 활용한 Subsystem↔UI 출력 연동으로 **반응형 시스템 설계**를 학습
 
-## 진행 상태
- - [X] Subsystem 연동 및 트리거/완료 조건 구현
- - [X] Delegate 기반 UI 출력
- - [ ] DataTable 연동
+4. DataTable, SaveGame을 통한 상태 저장 및 로딩으로 **데이터 기반 흐름 구성**을 학습
+
+## 진행 현황
+**완료된 항목**
+ - [X] Subsystem 연동 및 트리거/완료 조건 구현  
+  → UserWidget, HUD, Subsystem 등의 구조 세분화를 통해 Actor의 책임을 명확히 분리  
+ - [X] Delegate 기반 UI 출력  
+  → ㅎ믇InstanceSubsystem을 활용하여 반응형 퀘스트 알림 구조 완성  
+ - [X] DataTable 연동  
+  → FQuestData를 선언 및 정의하여 퀘스트 데이터 정의 자동화 및 일관된 관리가 가능하도록 구성  
+
+**예정된 항목**
  - [ ] SaveGame 구조 (퀘스트 현황 Save / Load)
+  → 퀘스트 상태를 저장 및 복원하여 지속 가능한 퀘스트 시스템 구현
  - [ ] 병렬 퀘스트 대응 설계
+  → 다수의 퀘스트를 동시에 진행 및 트래킹할 수 있는 병렬 구조 설계
 
 ## Author
    **JellytoCodes / 2025.05**
