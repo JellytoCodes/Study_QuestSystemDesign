@@ -4,49 +4,22 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
+#include "QuestDataDefs.h"
+#include "QuestNameDefs.h"
 #include "UPrototypeQuestSubsystem.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnQuestUpdated, FName, QuestID, bool, bCompleted);
 
-UENUM(BlueprintType)
-enum class EQuestTriggerType : uint8
-{
-	None UMETA(DisplayName = "None"),
-	Trigger UMETA(DisplayName = "Trigger"),
-	Interaction UMETA(DisplayName = "Interaction"),
-	Pickup UMETA(DisplayName = "Pickup"),
-};
-
-UENUM(BlueprintType)
-enum class EQuestConditionType : uint8
-{
-	None,
-	ReachArea,
-	TalkToNPC,
-	PickupItem,
-	KillEnemy,
-	Custom,
-};
-
 USTRUCT(BlueprintType)
-struct FQuestData
+struct FQuestState
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite)
 	bool bIsStarted = false;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite)
 	bool bIsCompleted = false;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	EQuestTriggerType TriggerType = EQuestTriggerType::None;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	EQuestConditionType ConditionType = EQuestConditionType::None;
-
-	UPROPERTY()
-	FName RequiredValue = NAME_None;
 };
 
 UCLASS()
@@ -58,24 +31,22 @@ public :
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
 
-	void SetQuestStarted(FName QuestID, FQuestData AddData);
+	void SetQuestStarted(FName QuestID);
 	void SetQuestCompleted(FName QuestID);
-	void RegisterQuest(FName QuestID, EQuestTriggerType Type);
 
 	bool IsQuestStarted(FName QuestID) const;
 	bool IsQuestCompleted(FName QuestID) const;
 
-	EQuestTriggerType GetQuestTriggerType(FName QuestID) const;
-	EQuestConditionType GetQuestConditionType(FName QuestID) const;
-
-	bool TryCompleteQuest(FName QuestID, EQuestConditionType CompletedType, FName Value);
-
 	UPROPERTY(BlueprintAssignable)
 	FOnQuestUpdated OnQuestUpdated;
 
-	FName GetCurrentQuestID(bool bIsCompleted) const;
+	const FQuestData* GetQuestData(FName QuestID);
 
+	bool TryCompleteQuest(FName ItemID);
 private :
+	UPROPERTY()
+	class UDataTable* QuestDataTable;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Quest")
-	TMap<FName, FQuestData> QuestMap;
+	TMap<FName, FQuestState> QuestStateMap;
 };

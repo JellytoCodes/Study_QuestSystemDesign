@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "UPrototypeQuestSubsystem.h"
+#include "QuestDataDefs.h"
 #include "QuestNameDefs.h"
 #include "TriggerQuestVolume.generated.h"
 
@@ -20,9 +21,6 @@ public:
 	// Sets default values for this actor's properties
 	ATriggerQuestVolume();
 
-	UPROPERTY(EditDefaultsOnly, Category = "Quest")
-	EQuestTriggerType TriggerType = EQuestTriggerType::Trigger;
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -35,6 +33,6 @@ private :
 	UBoxComponent* BoxComponent;
 
 	UPROPERTY(EditAnywhere, Category = "Quest")
-	EQuestName QuestID;
+	FName QuestID;
 
 };

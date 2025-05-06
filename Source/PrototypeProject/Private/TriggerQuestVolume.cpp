@@ -23,50 +23,43 @@ ATriggerQuestVolume::ATriggerQuestVolume()
 // Called when the game starts or when spawned
 void ATriggerQuestVolume::BeginPlay()
 {
-	Super::BeginPlay();	
-	BoxComponent->OnComponentBeginOverlap.AddDynamic(this, &ATriggerQuestVolume::OnOverlapBegin);
+	Super::BeginPlay();
 
-	if(UUPrototypeQuestSubsystem* QuestSystem = GetGameInstance()->GetSubsystem<UUPrototypeQuestSubsystem>())
-	{
-		QuestSystem->RegisterQuest(FQuestNameHelper::ToFName(QuestID), TriggerType);
-	}
+	BoxComponent->OnComponentBeginOverlap.AddDynamic(this, &ATriggerQuestVolume::OnOverlapBegin);
 }
 
 void ATriggerQuestVolume::OnOverlapBegin(UPrimitiveComponent *OverlappedComp, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
 	if(ACharacter* Character = Cast<ACharacter>(OtherActor))
 	{
-		if(UUPrototypeQuestSubsystem* QuestSystem = GetGameInstance()->GetSubsystem<UUPrototypeQuestSubsystem>())
+		//퀘스트 서브시스템 할당 및 로드 Failed 시 return
+		auto QuestSystem = GetGameInstance()->GetSubsystem<UUPrototypeQuestSubsystem>();
+		if(!QuestSystem || QuestID.IsNone()) return;
+
+		//퀘스트 데이터테이블 할당 및 로드 Failed 시 return
+		const FQuestData* QuestData = QuestSystem->GetQuestData(QuestID);
+		if(!QuestData) return;
+
+		//이미 완료된 퀘스트 Skip을 위한 장치
+		if(QuestSystem->IsQuestCompleted(QuestID)) return;
+
+		//퀘스트 Trigger 타입 검사
+		if(QuestData->TriggerType != EQuestTriggerType::Trigger) return;
+
+		//퀘스트 시작 처리
+		if(!QuestSystem->IsQuestStarted(QuestID))
 		{
-			FName QuestName = FQuestNameHelper::ToFName(QuestID);
-			EQuestTriggerType Type = QuestSystem->GetQuestTriggerType(QuestName);
-			if(Type == TriggerType)
-			{
-				if (APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0))
-				{
+			QuestSystem->SetQuestStarted(QuestID);
+			UE_LOG(LogTemp, Log, TEXT("Started Quest :%s"), *QuestData->QuestTitle.ToString());
+		}
 
-					if (AGameHUD* HUD = Cast<AGameHUD>(PC->GetHUD()))
-					{
-						if(!QuestSystem->IsQuestStarted(QuestName))
-						{
-							FQuestData Data;
-							Data.TriggerType = EQuestTriggerType::Trigger;
-							Data.ConditionType = EQuestConditionType::ReachArea;
-							Data.RequiredValue = "None";
-
-							QuestSystem->SetQuestStarted(QuestName, Data);
-							HUD->StartedWidget(QuestName);
-						}
-						else if(!QuestSystem->IsQuestCompleted(QuestName))
-						{
-							QuestSystem->SetQuestCompleted(QuestName);
-							HUD->CompletedWidget(QuestName);
-						}
-					}
-				}
-				BoxComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-				Destroy();
-			}		
+		else if(QuestData->ConditionType == EQuestConditionType::ReachArea && 
+		QuestSystem->IsQuestStarted(QuestID) && !QuestSystem->IsQuestCompleted(QuestID))
+		{
+			QuestSystem->SetQuestCompleted(QuestID);
+			UE_LOG(LogTemp, Log, TEXT("Completed Quest :%s"), *QuestData->QuestTitle.ToString());
 		}
 	}
+	BoxComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	Destroy();
 }

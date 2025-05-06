@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "UPrototypeQuestSubsystem.h"
 #include "QuestNameDefs.h"
+#include "QuestDataDefs.h"
 #include "QuestNPC.generated.h"
 
 UCLASS()
@@ -21,15 +22,11 @@ public:
 	AQuestNPC();
 
 	UPROPERTY(EditAnywhere, Category = "Quest")
-	EQuestName QuestID;
+	FName QuestID;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Quest")
-	EQuestTriggerType TriggerType = EQuestTriggerType::Interaction;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Quest")
-	EQuestConditionType ConditionType = EQuestConditionType::PickupItem;
-
-	bool Interact(class APrototypeProjectCharacter* PlayerCharacter);
+	void Interact(class APrototypeProjectCharacter* PlayerCharacter);
+	
+	FName GetQuestID() const;
 
 protected:
 	// Called when the game starts or when spawned

@@ -181,6 +181,6 @@ void APrototypeProjectCharacter::NotifyItemPicked()
 	if(UUPrototypeQuestSubsystem* QuestSys = GetGameInstance()->GetSubsystem<UUPrototypeQuestSubsystem>())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("NotifyItemPicked!"));
-		QuestSys->TryCompleteQuest(FQuestNameHelper::ToFName(EQuestName::TalkToNPC01), EQuestConditionType::PickupItem, "KEY001");
+		QuestSys->TryCompleteQuest("KEY001");
 	}
 }

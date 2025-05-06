@@ -24,6 +24,7 @@ void UQuestUIWidget::NativeConstruct()
 
 void UQuestUIWidget::OnQuestUpdated(FName QuestID, bool bIsCompleted)
 {
+	UE_LOG(LogTemp, Log, TEXT("OnQuestUpdated!"));
 	FQueuedQuestNotification NewNotify;
 	NewNotify.QuestID = QuestID;
 	NewNotify.bIsCompleted = bIsCompleted;

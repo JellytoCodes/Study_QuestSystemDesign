@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
 #include "QuestNameDefs.h"
+#include "QuestDataDefs.h"
 #include "PrototypeProjectCharacter.generated.h"
 
 class USpringArmComponent;

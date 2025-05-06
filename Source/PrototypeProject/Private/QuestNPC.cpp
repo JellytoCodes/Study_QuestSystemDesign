@@ -24,11 +24,6 @@ AQuestNPC::AQuestNPC()
 void AQuestNPC::BeginPlay()
 {
 	Super::BeginPlay();
-
-	if (UUPrototypeQuestSubsystem* QuestSystem = GetGameInstance()->GetSubsystem<UUPrototypeQuestSubsystem>())
-	{
-		QuestSystem->RegisterQuest(FQuestNameHelper::ToFName(QuestID), TriggerType);
-	}
 }
 
 // Called every frame
@@ -38,40 +33,34 @@ void AQuestNPC::Tick(float DeltaTime)
 
 }
 
-bool AQuestNPC::Interact(APrototypeProjectCharacter *PlayerCharacter)
-{
-	if(UUPrototypeQuestSubsystem* QuestSystem = GetGameInstance()->GetSubsystem<UUPrototypeQuestSubsystem>())
+void AQuestNPC::Interact(APrototypeProjectCharacter *PlayerCharacter)
+{		
+	if(APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0))
 	{
-		FName QuestName = FQuestNameHelper::ToFName(QuestID);
-		EQuestTriggerType Type = QuestSystem->GetQuestTriggerType(QuestName);
+		//퀘스트 서브시스템 할당 및 로드 Failed 시 return
+		auto QuestSystem = GetGameInstance()->GetSubsystem<UUPrototypeQuestSubsystem>();
+		if(!QuestSystem || QuestID.IsNone()) return;
+
+		//퀘스트 데이터테이블 할당 및 로드 Failed 시 return
+		const FQuestData* QuestData = QuestSystem->GetQuestData(QuestID);
+		if(!QuestData) return;
+
+		//이미 완료된 퀘스트 Skip을 위한 장치
+		if(QuestSystem->IsQuestCompleted(QuestID)) return;
 		
-		if(Type == TriggerType) //TriggerType = EQuestTriggerType::Interaction
-		{			
-			if(APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0))
-			{
-				if(AGameHUD* HUD = Cast<AGameHUD>(PC->GetHUD()))
-				{
-					if(!QuestSystem->IsQuestStarted(QuestName))
-					{
-						FQuestData Data;
-						Data.TriggerType = EQuestTriggerType::Interaction;
-						Data.ConditionType = EQuestConditionType::PickupItem;
-						Data.RequiredValue = "KEY001";
+		//퀘스트 Trigger 타입 검사
+		if(QuestData->TriggerType != EQuestTriggerType::Interaction) return;
 
-						QuestSystem->SetQuestStarted(QuestName, Data);
-
-						HUD->StartedWidget(QuestName);
-					}
-					/*PiupItemQuest 변경으로 해당 코드는 사용하지 않음
-					else if(!QuestSystem->IsQuestCompleted(QuestName))
-					{
-						QuestSystem->SetQuestCompleted(QuestName);
-						HUD->CompletedWidget(QuestName);
-					}*/
-				}
-			}
-			return true;
+		//퀘스트 시작 처리
+		if(!QuestSystem->IsQuestStarted(QuestID))
+		{
+			QuestSystem->SetQuestStarted(QuestID);
+			UE_LOG(LogTemp, Log, TEXT("Started Quest :%s"), *QuestData->QuestTitle.ToString());
 		}
 	}
-	return false;
+}
+
+FName AQuestNPC::GetQuestID() const
+{
+	return QuestID;
 }

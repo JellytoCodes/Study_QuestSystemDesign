@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-//#include "QuestNameDefs.generated.h"
+#include "QuestNameDefs.generated.h"
 
 UENUM(BlueprintType)
 enum class EQuestName : uint8

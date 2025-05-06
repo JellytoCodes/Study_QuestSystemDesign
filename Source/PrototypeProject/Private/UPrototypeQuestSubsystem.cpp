@@ -3,44 +3,57 @@
 #include "UPrototypeQuestSubsystem.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
-#include "GameHUD.h"
-#include "QuestNameDefs.h"
 
 void UUPrototypeQuestSubsystem::Initialize(FSubsystemCollectionBase &Collection)
 {
 	Super::Initialize(Collection);
 
-	UE_LOG(LogTemp, Log, TEXT("QuestSubsystem Initialized"));
+	UDataTable* LoadedTable = Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), nullptr, TEXT("/Game/Blueprints/DT_QuestData.DT_QuestData")));
+	if(LoadedTable)
+	{
+		UE_LOG(LogTemp, Log, TEXT("QuestSubsystem DataTable Initialized"));
+		QuestDataTable = LoadedTable;
+	}
+	TArray<FName> RowNames = QuestDataTable->GetRowNames();
+	for(const FName& RowName : RowNames)
+	{
+		if(!QuestStateMap.Contains(RowName))
+		{
+			FQuestState InitialState;
+			InitialState.bIsStarted = false;
+			InitialState.bIsCompleted = false;
+			QuestStateMap.Add(RowName, InitialState);
+		}
+	}
 }
 
 void UUPrototypeQuestSubsystem::Deinitialize()
 {
 	Super::Deinitialize();
-	QuestMap.Empty();
+	QuestStateMap.Empty();
 }
 
-void UUPrototypeQuestSubsystem::SetQuestStarted(FName QuestID, FQuestData AddData)
+void UUPrototypeQuestSubsystem::SetQuestStarted(FName QuestID)
 {
-	EQuestName QuestName = FQuestNameHelper::FromFName(QuestID);
-	if(FQuestData* QuestData = QuestMap.Find(QuestID))
+	if(FQuestState* State = QuestStateMap.Find(QuestID))
 	{
-		if(!QuestData->bIsStarted)
+		if(!State->bIsStarted)
 		{
-			*QuestData = AddData;
-			QuestData->bIsStarted = true;
+			State->bIsStarted = true;
 			OnQuestUpdated.Broadcast(QuestID, false);
+			UE_LOG(LogTemp, Log, TEXT("bIsStarted Set : %d"), State->bIsStarted);
 		}
 	}
 }
 
 void UUPrototypeQuestSubsystem::SetQuestCompleted(FName QuestID)
 {
-	if(FQuestData* QuestData = QuestMap.Find(QuestID))
+	if(FQuestState* State = QuestStateMap.Find(QuestID))
 	{
-		if(QuestData->bIsStarted && !QuestData->bIsCompleted)
+		if(State->bIsStarted && !State->bIsCompleted)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("bIsCompleted"));
-			QuestData->bIsCompleted = true;
+			State->bIsCompleted = true;
 			OnQuestUpdated.Broadcast(QuestID, true);
 		}
 	}
@@ -48,79 +61,48 @@ void UUPrototypeQuestSubsystem::SetQuestCompleted(FName QuestID)
 
 bool UUPrototypeQuestSubsystem::IsQuestStarted(FName QuestID) const
 {
-	if(const FQuestData* QuestData = QuestMap.Find(QuestID))
+	if(const FQuestState* State = QuestStateMap.Find(QuestID))
 	{
-		return QuestData->bIsStarted;
+		return State->bIsStarted;
 	}
 	return false;
 }
 
 bool UUPrototypeQuestSubsystem::IsQuestCompleted(FName QuestID) const
 {
-	if(const FQuestData* QuestData = QuestMap.Find(QuestID))
+	if(const FQuestState* State = QuestStateMap.Find(QuestID))
 	{
-		return QuestData->bIsCompleted;
+		return State->bIsCompleted;
 	}
 	return false;
 }
 
-FName UUPrototypeQuestSubsystem::GetCurrentQuestID(bool bIsCompleted) const
+const FQuestData *UUPrototypeQuestSubsystem::GetQuestData(FName QuestID)
 {
-	for (const TPair<FName, FQuestData>& Elem : QuestMap)
+	if(!QuestDataTable) return nullptr;
+	return QuestDataTable->FindRow<FQuestData>(QuestID, TEXT("QuestSubsystemLookUp"));
+}
+
+bool UUPrototypeQuestSubsystem::TryCompleteQuest(FName ItemID)
+{
+	for (const auto& Pair : QuestStateMap)
 	{
-		if(bIsCompleted && Elem.Value.bIsCompleted)
+		const FName& QuestID = Pair.Key;
+		const FQuestState& State = Pair.Value;
+
+		if (!State.bIsStarted || State.bIsCompleted)
+			continue;
+
+		const FQuestData* QuestData = GetQuestData(QuestID);
+		if (!QuestData) continue;
+
+		// 이 퀘스트가 아이템 기반이고, 아이템이 포함돼 있으면 완료
+		if (QuestData->ConditionType == EQuestConditionType::PickupItem && QuestData->RequiredItems.Contains(ItemID))
 		{
-			return Elem.Key;
-		}
-		else if(!bIsCompleted && Elem.Value.bIsStarted && !Elem.Value.bIsCompleted)
-		{
-			return Elem.Key;
-		}
-	}
-	return NAME_None;
-}
-
-void UUPrototypeQuestSubsystem::RegisterQuest(FName QuestID, EQuestTriggerType Type)
-{
-	if(!QuestMap.Contains(QuestID))
-	{
-		FQuestData NewData;
-		NewData.TriggerType = Type;
-		QuestMap.Add(QuestID, NewData);
-	}
-}
-
-EQuestTriggerType UUPrototypeQuestSubsystem::GetQuestTriggerType(FName QuestID) const
-{
-	if(const FQuestData* Quest = QuestMap.Find(QuestID))
-	{
-		return Quest->TriggerType;
-	}
-	return EQuestTriggerType::None;
-}
-
-EQuestConditionType UUPrototypeQuestSubsystem::GetQuestConditionType(FName QuestID) const
-{
-	if(const FQuestData* Quest = QuestMap.Find(QuestID))
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Get ConditionType"));
-		return Quest->ConditionType;
-	}
-	return EQuestConditionType::None;
-}
-
-bool UUPrototypeQuestSubsystem::TryCompleteQuest(FName QuestID, EQuestConditionType CompletedType, FName Value)
-{
-	if(FQuestData* Quest = QuestMap.Find(QuestID))
-	{
-		if(Quest->bIsStarted && !Quest->bIsCompleted && Quest->ConditionType == CompletedType &&
-		(Quest->RequiredValue.IsNone() || Quest->RequiredValue == Value))
-		{
-			UE_LOG(LogTemp, Warning, TEXT("TryCompleteQuest!"));
 			SetQuestCompleted(QuestID);
+			UE_LOG(LogTemp, Log, TEXT("Quest '%s' completed by picking up item '%s'"), *QuestID.ToString(), *ItemID.ToString());
 			return true;
 		}
 	}
 	return false;
 }
-
