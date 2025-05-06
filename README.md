@@ -1,4 +1,4 @@
-#Study_PrototypeProject
+#Study_QuestSystemDesign
 
 **Unreal Engine 5.4.4 기반의 학습용 실험 프로젝트**
 
