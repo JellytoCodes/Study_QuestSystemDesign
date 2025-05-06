@@ -184,6 +184,8 @@ void APrototypeProjectCharacter::SaveLoad(const FInputActionValue &Value)
 	{
 		if(AGameHUD* HUD = Cast<AGameHUD>(PlayerController->GetHUD()))
 		{
+			if(!PlayerController->bShowMouseCursor) PlayerController->bShowMouseCursor = true;
+			else PlayerController->bShowMouseCursor = false;
 			HUD->SaveLoadViewWidget();
 		}
 	}
