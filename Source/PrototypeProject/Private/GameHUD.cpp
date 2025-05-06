@@ -9,21 +9,28 @@
 #include "Kismet/GameplayStatics.h"
 #include "Blueprint/UserWidget.h"
 #include "PrototypeProject/PrototypeProjectCharacter.h"
+#include "GameSaveLoad.h"
 
 AGameHUD::AGameHUD()
 {
     PrimaryActorTick.bCanEverTick = true;
     
     static ConstructorHelpers::FClassFinder<UQuestUIWidget> WidgetBPClass(TEXT("/Game/Blueprints/WBP_QuestUIWidget.WBP_QuestUIWidget_C"));
-    if (WidgetBPClass.Succeeded())
+    if(WidgetBPClass.Succeeded())
     {
          QuestWidgetUI = WidgetBPClass.Class;
     }
 
-    static ConstructorHelpers::FClassFinder<UTimeManagerWidget> TimerBPClass(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/Blueprints/WBP_TimerUI.WBP_TimerUI_C'"));
-    if (TimerBPClass.Succeeded())
+    static ConstructorHelpers::FClassFinder<UTimeManagerWidget> TimerBPClass(TEXT("/Game/Blueprints/WBP_TimerUI.WBP_TimerUI_C"));
+    if(TimerBPClass.Succeeded())
     {
          TimerWidgetUI = TimerBPClass.Class;
+    }
+
+    static ConstructorHelpers::FClassFinder<UGameSaveLoad> SaveLoadBPClass(TEXT("/Game/Blueprints/WBP_SaveLoadUIWidget.WBP_SaveLoadUIWidget_C"));
+    if(SaveLoadBPClass.Succeeded())
+    {
+        SaveLoadWidgetUI = SaveLoadBPClass.Class;
     }
 }
 
@@ -40,8 +47,10 @@ void AGameHUD::BeginPlay()
 		Timer->OnDefenseTimeCompleted.AddDynamic(this, &AGameHUD::GameClear);
     }
 
+    //각 UserWidget 초기화
     QuestWidget = CreateWidget<UQuestUIWidget>(GetWorld(), QuestWidgetUI);
     TimerWidget = CreateWidget<UTimeManagerWidget>(GetWorld(), TimerWidgetUI);
+    SaveLoadWidget = CreateWidget<UGameSaveLoad>(GetWorld(), SaveLoadWidgetUI);
 
     TimerWidget->AddToViewport();
     QuestWidget->AddToViewport();
@@ -67,6 +76,21 @@ void AGameHUD::CompletedWidget(FName QuestID)
 
 void AGameHUD::StartedWidget(FName QuestID)
 {
+
+}
+
+void AGameHUD::SaveLoadViewWidget()
+{
+    if(!bIsSaveLoad)
+    {
+        SaveLoadWidget->AddToViewport();
+        bIsSaveLoad = true;
+    }
+    else
+    {
+        SaveLoadWidget->RemoveFromParent();
+        bIsSaveLoad = false;
+    }
 
 }
 

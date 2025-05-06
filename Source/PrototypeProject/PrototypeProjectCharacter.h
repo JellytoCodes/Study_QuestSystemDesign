@@ -55,6 +55,9 @@ class APrototypeProjectCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* QuestTestAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* SaveLoadAction;
+
 public:
 	APrototypeProjectCharacter();
 	
@@ -66,6 +69,7 @@ protected:
 	void Look(const FInputActionValue& Value);
 	void Pause(const FInputActionValue& Value);
 	void Interact(const FInputActionValue& Value);
+	void SaveLoad(const FInputActionValue& Value);
 
 protected:
 

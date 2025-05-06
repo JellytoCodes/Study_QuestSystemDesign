@@ -13,6 +13,7 @@
 #include "UPrototypeQuestSubsystem.h"
 #include "TimeManager.h"
 #include "QuestNPC.h"
+#include "GameHUD.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -88,6 +89,7 @@ void APrototypeProjectCharacter::SetupPlayerInputComponent(UInputComponent* Play
 		EnhancedInputComponent->BindAction(PauseAction, ETriggerEvent::Started, this, &APrototypeProjectCharacter::Pause);
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &APrototypeProjectCharacter::Interact);
 		EnhancedInputComponent->BindAction(QuestTestAction, ETriggerEvent::Started, this, &APrototypeProjectCharacter::NotifyItemPicked);
+		EnhancedInputComponent->BindAction(SaveLoadAction, ETriggerEvent::Started, this, &APrototypeProjectCharacter::SaveLoad);
 	}
 	else
 	{
@@ -172,6 +174,17 @@ void APrototypeProjectCharacter::Interact(const FInputActionValue &Value)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("No actor hit"));
 			}
+		}
+	}
+}
+
+void APrototypeProjectCharacter::SaveLoad(const FInputActionValue &Value)
+{
+	if(APlayerController* PlayerController = Cast<APlayerController>(GetController()))
+	{
+		if(AGameHUD* HUD = Cast<AGameHUD>(PlayerController->GetHUD()))
+		{
+			HUD->SaveLoadViewWidget();
 		}
 	}
 }

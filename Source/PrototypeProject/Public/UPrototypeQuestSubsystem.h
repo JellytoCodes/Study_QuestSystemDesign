@@ -31,18 +31,30 @@ public :
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
 
+	//퀘스트 시작 / 완료 설정 및 Broadcast
 	void SetQuestStarted(FName QuestID);
 	void SetQuestCompleted(FName QuestID);
 
+	//현재 퀘스트 시작 / 완료 여부 반환
 	bool IsQuestStarted(FName QuestID) const;
 	bool IsQuestCompleted(FName QuestID) const;
 
 	UPROPERTY(BlueprintAssignable)
 	FOnQuestUpdated OnQuestUpdated;
 
+	//퀘스트 DataTable Import
 	const FQuestData* GetQuestData(FName QuestID);
 
+	//조건에 따른 퀘스트 완료 처리
 	bool TryCompleteQuest(FName ItemID);
+
+	//퀘스트 Save / Load
+	UFUNCTION(BlueprintCallable)
+	void SaveQuestProgress(const FString& SlotName);
+
+	UFUNCTION(BlueprintCallable)
+	void LoadQuestProgress(const FString& SlotName);
+
 private :
 	UPROPERTY()
 	class UDataTable* QuestDataTable;

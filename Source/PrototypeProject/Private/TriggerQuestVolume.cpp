@@ -53,6 +53,7 @@ void ATriggerQuestVolume::OnOverlapBegin(UPrimitiveComponent *OverlappedComp, AA
 			UE_LOG(LogTemp, Log, TEXT("Started Quest :%s"), *QuestData->QuestTitle.ToString());
 		}
 
+		//퀘스트 완료 처리
 		else if(QuestData->ConditionType == EQuestConditionType::ReachArea && 
 		QuestSystem->IsQuestStarted(QuestID) && !QuestSystem->IsQuestCompleted(QuestID))
 		{
@@ -60,6 +61,8 @@ void ATriggerQuestVolume::OnOverlapBegin(UPrimitiveComponent *OverlappedComp, AA
 			UE_LOG(LogTemp, Log, TEXT("Completed Quest :%s"), *QuestData->QuestTitle.ToString());
 		}
 	}
+
+	//중복 감지 방지를 위해 제거
 	BoxComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	Destroy();
 }

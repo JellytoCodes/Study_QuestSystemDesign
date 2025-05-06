@@ -3,6 +3,7 @@
 #include "UPrototypeQuestSubsystem.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
+#include "QuestSaveGame.h"
 
 void UUPrototypeQuestSubsystem::Initialize(FSubsystemCollectionBase &Collection)
 {
@@ -96,7 +97,7 @@ bool UUPrototypeQuestSubsystem::TryCompleteQuest(FName ItemID)
 		const FQuestData* QuestData = GetQuestData(QuestID);
 		if (!QuestData) continue;
 
-		// 이 퀘스트가 아이템 기반이고, 아이템이 포함돼 있으면 완료
+		// 아이템 기반 퀘스트에 따른 완료 조건
 		if (QuestData->ConditionType == EQuestConditionType::PickupItem && QuestData->RequiredItems.Contains(ItemID))
 		{
 			SetQuestCompleted(QuestID);
@@ -105,4 +106,31 @@ bool UUPrototypeQuestSubsystem::TryCompleteQuest(FName ItemID)
 		}
 	}
 	return false;
+}
+
+void UUPrototypeQuestSubsystem::SaveQuestProgress(const FString& SlotName)
+{
+	UQuestSaveGame* SaveData = Cast<UQuestSaveGame>(UGameplayStatics::CreateSaveGameObject(UQuestSaveGame::StaticClass()));
+	if(!SaveData) return;
+
+	//퀘스트 상태 복사
+	SaveData->SavedQuestStates = QuestStateMap;
+
+	//퀘스트 상태 저장
+	if(UGameplayStatics::SaveGameToSlot(SaveData, SlotName, 0))
+	{
+		UE_LOG(LogTemp, Log, TEXT("Quest progress saved to slot"));
+	}
+}
+
+void UUPrototypeQuestSubsystem::LoadQuestProgress(const FString& SlotName)
+{
+	USaveGame* Loaded = UGameplayStatics::LoadGameFromSlot(SlotName, 0);
+	if(!Loaded) return;
+
+	if(UQuestSaveGame* SaveData = Cast<UQuestSaveGame>(Loaded))
+	{
+		QuestStateMap = SaveData->SavedQuestStates;
+		UE_LOG(LogTemp, Log, TEXT("Quest progress loaded from slot"));
+	}
 }

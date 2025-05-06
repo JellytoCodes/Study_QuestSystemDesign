@@ -6,9 +6,10 @@
 #include "GameFramework/HUD.h"
 #include "GameHUD.generated.h"
 
-/**
- * 
- */
+class UQuestUIWidget;
+class UTimeManagerWidget;
+class UGameSaveLoad;
+
 UCLASS()
 class PROTOTYPEPROJECT_API AGameHUD : public AHUD
 {
@@ -19,23 +20,30 @@ public :
 
 	void CompletedWidget(FName QuestID);
 	void StartedWidget(FName QuestID);
+	void SaveLoadViewWidget();
 
 protected :
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
 
+	//퀘스트 시작 / 완료 UI
 	UPROPERTY(EditAnywhere, Category = "UI")
-	TSubclassOf<class UQuestUIWidget> QuestWidgetUI;
-
+	TSubclassOf<UQuestUIWidget> QuestWidgetUI;
 	UQuestUIWidget* QuestWidget;
 
+	//타이머 UI
 	UPROPERTY(EditAnywhere, Category = "UI")
-	TSubclassOf<class UTimeManagerWidget> TimerWidgetUI;
-
+	TSubclassOf<UTimeManagerWidget> TimerWidgetUI;
 	UTimeManagerWidget* TimerWidget;
 
 	class UTimeManager* Timer;
 
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<UGameSaveLoad> SaveLoadWidgetUI;
+	UGameSaveLoad* SaveLoadWidget;
+
 	UFUNCTION()
 	void GameClear();
+
+	bool bIsSaveLoad = false;
 };
