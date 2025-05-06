@@ -48,18 +48,18 @@
 
 ## 진행 현황
 **완료된 항목**
- - [X] Subsystem 연동 및 트리거/완료 조건 구현  
+- [X] Subsystem 연동 및 트리거/완료 조건 구현  
   → UserWidget, HUD, Subsystem 등의 구조 세분화를 통해 Actor의 책임을 명확히 분리  
- - [X] Delegate 기반 UI 출력  
+- [X] Delegate 기반 UI 출력  
   → GameInstanceSubsystem을 활용하여 반응형 퀘스트 알림 구조 완성  
- - [X] DataTable 연동  
+- [X] DataTable 연동  
   → FQuestData를 선언 및 정의하여 퀘스트 데이터 정의 자동화 및 일관된 관리가 가능하도록 구성  
-- [ ] SaveGame 구조 (퀘스트 현황 Save / Load)
+- [X] SaveGame 구조 (퀘스트 현황 Save / Load)
   → USaveGame을 활용하여 퀘스트 상태를 저장 및 복원하여 지속 가능한 퀘스트 시스템 구현
   → 플레이어가 특정 키를 Bind 했을 때 Save/Load Widget이 활성화/비활성화될 수 있도록 구현
 
 **예정된 항목**
- - [ ] 병렬 퀘스트 대응 설계
+- [ ] 병렬 퀘스트 대응 설계
   → 다수의 퀘스트를 동시에 진행 및 트래킹할 수 있는 병렬 구조 설계
 
 ## Author
