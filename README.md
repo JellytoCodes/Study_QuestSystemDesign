@@ -51,7 +51,7 @@
  - [X] Subsystem 연동 및 트리거/완료 조건 구현  
   → UserWidget, HUD, Subsystem 등의 구조 세분화를 통해 Actor의 책임을 명확히 분리  
  - [X] Delegate 기반 UI 출력  
-  → ㅎ믇InstanceSubsystem을 활용하여 반응형 퀘스트 알림 구조 완성  
+  → GameInstanceSubsystem을 활용하여 반응형 퀘스트 알림 구조 완성  
  - [X] DataTable 연동  
   → FQuestData를 선언 및 정의하여 퀘스트 데이터 정의 자동화 및 일관된 관리가 가능하도록 구성  
 
