@@ -28,15 +28,19 @@ Unreal Engine의 구조적 특성을 바탕으로 **Subsystem / Data 중심 흐�
   → 조건, 보상, 연계 퀘스트 등을 쉽게 확장 가능한 구조로 설계
 
 ## 시스템 아키텍처 요약
-GameInstance	"UPrototypeQuestSubsystem (퀘스트 상태 관리)"  
- ↓	  
-TriggerVolume/NPC  "퀘스트 시작/완료 조건 판별"  
- ↓	  
-GameHUD	"UI 관리 위젯 생성 제어"  
- ↓  
-QuestUIWidget	  "퀘스트 목록 출력"   
-┗ NotifyWidget  "퀘스트 시작/종료 알림"  
-┗ ItemWidget    "퀘스트 현황 List"  
+[GameInstance]  
+  └── UPrototypeQuestSubsystem (퀘스트 상태 관리)
+
+[TriggerVolume / QuestNPC]  
+  └── 퀘스트 시작 / 완료 조건 판별  
+  └── Subsystem과 연동하여 상태 전달
+
+[GameHUD]  
+  └── UI 위젯 생성 및 관리  
+
+[QuestUIWidget]  
+  ├── QuestItemWidget       ← 퀘스트 리스트 출력 (병렬 출력)  
+  └── QuestNotifyWidget     ← 퀘스트 시작/완료 알림 애니메이션 
 
 ## 핵심 구현 사항 (완료 항목)
 - [X] **Subsystem 연동 및 트리거/완료 조건 구현**   
