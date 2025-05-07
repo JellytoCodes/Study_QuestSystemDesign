@@ -9,6 +9,7 @@
 #include "UPrototypeQuestSubsystem.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnQuestUpdated, FName, QuestID, bool, bCompleted);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnQuestUpdatedOne, FName, QuestID);
 
 USTRUCT(BlueprintType)
 struct FQuestState
@@ -42,6 +43,9 @@ public :
 	UPROPERTY(BlueprintAssignable)
 	FOnQuestUpdated OnQuestUpdated;
 
+	UPROPERTY(BlueprintAssignable)
+	FOnQuestUpdatedOne OnQuestUpdatedOne;
+
 	//퀘스트 DataTable Import
 	const FQuestData* GetQuestData(FName QuestID);
 
@@ -54,6 +58,9 @@ public :
 
 	UFUNCTION(BlueprintCallable)
 	void LoadQuestProgress(const FString& SlotName);
+
+	//QuestState를 외부에서 읽어올 수 있도록하는 함수
+	const TMap<FName, FQuestState>& GetAllQuestStates() const;
 
 private :
 	UPROPERTY()

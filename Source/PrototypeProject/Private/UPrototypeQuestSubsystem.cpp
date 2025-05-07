@@ -42,6 +42,7 @@ void UUPrototypeQuestSubsystem::SetQuestStarted(FName QuestID)
 		{
 			State->bIsStarted = true;
 			OnQuestUpdated.Broadcast(QuestID, false);
+			OnQuestUpdatedOne.Broadcast(QuestID);
 			UE_LOG(LogTemp, Log, TEXT("bIsStarted Set : %d"), State->bIsStarted);
 		}
 	}
@@ -56,6 +57,7 @@ void UUPrototypeQuestSubsystem::SetQuestCompleted(FName QuestID)
 			UE_LOG(LogTemp, Warning, TEXT("bIsCompleted"));
 			State->bIsCompleted = true;
 			OnQuestUpdated.Broadcast(QuestID, true);
+			OnQuestUpdatedOne.Broadcast(QuestID);
 		}
 	}
 }
@@ -133,4 +135,9 @@ void UUPrototypeQuestSubsystem::LoadQuestProgress(const FString& SlotName)
 		QuestStateMap = SaveData->SavedQuestStates;
 		UE_LOG(LogTemp, Log, TEXT("Quest progress loaded from slot"));
 	}
+}
+
+const TMap<FName, FQuestState> &UUPrototypeQuestSubsystem::GetAllQuestStates() const
+{
+	return QuestStateMap;
 }
