@@ -37,39 +37,41 @@
 
 ## 🗂️ 시스템 아키텍처 요약
 **🧱 GameInstance**  
-  └──UPrototypeQuestSubsystem (퀘스트 상태 등록 및 처리)
+&nbsp;└──UPrototypeQuestSubsystem (퀘스트 상태 등록 및 처리)
   
 **🧱 TriggerVolume / QuestNPC**  
-  ├──퀘스트 시작 / 완료 조건 판별  
-  └──Subsystem과 연동하여 상태 전달
+ &nbsp;├──퀘스트 시작 / 완료 조건 판별  
+&nbsp;└──Subsystem과 연동하여 상태 전달
 
 **🧱 GameHUD**  
-  └──UI 위젯 생성 및 관리  
+&nbsp;└──UI 위젯 생성 및 관리  
 
 **🧱 QuestUIWidget**  
-  ├──QuestItemWidget       ← 퀘스트 리스트 출력 (병렬 출력)  
-  └──QuestNotifyWidget     ← 퀘스트 시작/완료 알림 애니메이션 
+&nbsp;├──QuestItemWidget       ← 퀘스트 리스트 출력 (병렬 출력)  
+&nbsp;└──QuestNotifyWidget     ← 퀘스트 시작/완료 알림 애니메이션 
 
+<br>
 
 ## ⚙️ 핵심 구현 사항 (완료 항목)
 - [X] **Subsystem 연동 및 트리거/완료 조건 구현**   
-  → UserWidget, HUD, Subsystem 등의 구조 세분화를 통해 Actor의 책임을 명확히 분리
+&nbsp;&nbsp;→ UserWidget, HUD, Subsystem 등의 구조 세분화를 통해 Actor의 책임을 명확히 분리
 
 - [X] **Delegate 기반 반응형 UI 연동**  
-  → 퀘스트 시작/완료 시 Broadcast()로 UI에 실시간 반영
+&nbsp;&nbsp;→ 퀘스트 시작/완료 시 Broadcast()로 UI에 실시간 반영
 
 - [X] **DataTable 기반 퀘스트 정의**  
-  → FQuestData 구조체 기반으로 ID/트리거/조건 등 퀘스트 구조 설계
-  → UDataTable로 관리하여 쉽게 수정 가능
+&nbsp;&nbsp;→ FQuestData 구조체 기반으로 ID/트리거/조건 등 퀘스트 구조 설계
+&nbsp;&nbsp;→ UDataTable로 관리하여 쉽게 수정 가능
 
 - [X] **SaveGame 구조 (퀘스트 현황 Save / Load)**  
-  → USaveGame을 활용하여 퀘스트 상태를 저장 및 불러오기  
-  → 플레이어 특정 키 Bind를 통해 GameSaveLoadWidget으로 UI 슬롯 처리  
+&nbsp;&nbsp;→ USaveGame을 활용하여 퀘스트 상태를 저장 및 불러오기  
+&nbsp;&nbsp;→ 플레이어 특정 키 Bind를 통해 GameSaveLoadWidget으로 UI 슬롯 처리  
 
 - [X] **병렬 퀘스트 대응 설계**  
-  → TMap을 활용하여 다중 퀘스트 동시 진행 구조화  
-  → QuestItemWidget을 통해 실시간 목록 동기화  
+&nbsp;&nbsp;→ TMap을 활용하여 다중 퀘스트 동시 진행 구조화  
+&nbsp;&nbsp;→ QuestItemWidget을 통해 실시간 목록 동기화  
 
+<br>
 
 ## 🧑‍💻 Author
-   **JellytoCodes / 2025.05**
+**JellytoCodes / 2025.05**
